@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <style>
+            html, body,#map {
+                width: 100%; height: 100%; padding: 0; margin: 0;
+            }
+            /* #map{
+                width: 0px;
+            } */
+        </style>
+    </head>
+    <body onload="">
+        <div id="info"></div>
+        <div id="map"></div>
+        <script src="https://api-maps.yandex.ru/2.1/?apikey={{yandexkey}}&lang=ru_RU"></script>
+        <script>
+        
+        ymaps.ready(init);
+        exist = false;
+        function init(){
+            var myMap = new ymaps.Map("map", {
+                center: [parseFloat('{{x}}'.replace(',','.')),parseFloat('{{y}}'.replace(',','.')) ],
+                zoom: 9,
+                controls: []
+            }); 
+            var q = JSON.parse(JSON.parse(JSON.stringify('{{ totalarr }}'.trim().replaceAll('&#x27;','"').replaceAll('&#x27;','"').replaceAll('u',''))));
+            console.log(q);
+            
+            for (const [key, value] of Object.entries(q)) {
+
+                mkad_km = value;
+                console.log([value]);
+                var polygon = new ymaps.Polygon([mkad_km]);
+                polygon.options.fill = true;
+                polygon.options.set('visible', true); 
+                polygon.options.fillColor = 'eb4034';
+                polygon.options.setParent(myMap.options);
+                polygon.geometry.setMap(myMap);
+                myMap.geoObjects.add(polygon);
+                var myPlacemark = new ymaps.Placemark(
+                    [parseFloat('{{x}}'.replace(',','.')), parseFloat('{{y}}'.replace(',','.'))], {
+                        iconContent: "Точка",
+                        balloonContent: "Столица России"
+                    }, {
+                        draggable: true,
+                        hideIconOnBalloonOpen: false
+                    }
+                );
+
+                myMap.geoObjects.add(myPlacemark);
+                if (polygon.geometry.contains([parseFloat('{{x}}'.replace(',','.')) , parseFloat('{{y}}'.replace(',','.'))])) {
+                    document.getElementById('info').innerHTML += 'Входит в область доставки. Стоимость - '+ key + '.{{ shop.street}}'
+                    exist = true;
+                }else{
+                    console.log('не входит')
+                }
+            }
+            
+            if (exist == false){
+                document.getElementById('info').innerHTML += 'Не входит в область доставки.'
+            }
+        }
+        function loaded(){
+            ymaps.ready(init);
+            exist = false;
+            function init(){
+                var myMap = new ymaps.Map("map", {
+                    center: [parseFloat('{{x}}'.replace(',','.')),parseFloat('{{y}}'.replace(',','.')) ],
+                    zoom: 9,
+                    controls: []
+                }); 
+                var q = JSON.parse(JSON.parse(JSON.stringify('{{ totalarr }}'.trim().replaceAll('&#x27;','"').replaceAll('&#x27;','"').replaceAll('u',''))));
+                console.log(q);
+                
+                for (const [key, value] of Object.entries(q)) {
+
+                    mkad_km = value;
+                    console.log([value]);
+                    var polygon = new ymaps.Polygon([mkad_km]);
+                    polygon.options.fill = true;
+                    polygon.options.set('visible', true); 
+                    polygon.options.fillColor = 'eb4034';
+                    polygon.options.setParent(myMap.options);
+                    polygon.geometry.setMap(myMap);
+                    myMap.geoObjects.add(polygon);
+                    var myPlacemark = new ymaps.Placemark(
+                        [parseFloat('{{x}}'.replace(',','.')), parseFloat('{{y}}'.replace(',','.'))], {
+                            iconContent: "Место",
+                            balloonContent: "Столица России"
+                        }, {
+                            draggable: true,
+                            hideIconOnBalloonOpen: false
+                        }
+                    );
+
+                    myMap.geoObjects.add(myPlacemark);
+                    if (polygon.geometry.contains([parseFloat('{{x}}'.replace(',','.')) , parseFloat('{{y}}'.replace(',','.'))])) {
+                        document.getElementById('info').innerHTML += 'Входит в область доставки. Стоимость - '+ key
+                        exist = true;
+                    }else{
+                        console.log('не входит')
+                    }
+                }
+                
+                if (exist == false){
+                    document.getElementById('info').innerHTML += 'Не входит в область доставки.'
+                }
+            }
+        }
+        </script>
+    </body>
+</html>
